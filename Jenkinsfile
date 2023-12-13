@@ -1,47 +1,53 @@
 pipeline {
+    //The agent section specifies where the entire Pipeline, or a specific stage, 
+    //will execute in the Jenkins environment depending on where the agent section is placed.
     agent any
-
+    
+    //The environment directive specifies a sequence of key-value pairs which will be defined
+    //as environment variables for all steps, or stage-specific steps, depending on where the environment directive is located within the Pipeline.
     environment {
-        CHANNEL_ACCESS_TOKEN = 'V1sQBsWv3nMo1Xn113ALhxRECcdMwBTs3saVWjLzPbudcKesfS7KTNrSExorYGB1b4Q4FUMm7Pmp6e/oPcYke2TSShO6mdBtfowe5FQJ+aOEDutPtOKclPzT1mXe0gc4N011Tsp6jVKNf1sKUtpd4QdB04t89/1O/w1cDnyilFU=',
-        USER_ID = 'Ue464dafed0dd29b2030afbbd2aa7eaac'
+        BUILD_USER = ''
+    }
+    
+    //The parameters directive provides a list of parameters that a user should provide when triggering the Pipeline.
+    //The values for these user-specified parameters are made available to Pipeline steps via the params object, see
+    //the Parameters, Declarative Pipeline for its specific usage.
+    parameters {
+        string(name: 'SPEC', defaultValue: 'cypress/e2e/**', description: 'Ej: cypress/e2e/**/*.spec.js')
+        choice(name: 'BROWSER', choices: ['chrome', 'edge', 'firefox'], description: 'Pick the web browser you want to use to run your scripts')
+    }
+    
+    //The options directive allows configuring Pipeline-specific options from within the Pipeline itself.
+    //Pipeline provides a number of these options, such as buildDiscarder, but they may also be provided by
+    //plugins, such as timestamps. Ex: retry on failure
+    options {
+        ansiColor('xterm')
     }
 
+    //The stage directive goes in the stages section and should contain a steps section, an optional agent section, 
+    //or other stage-specific directives. Practically speaking, all of the real work done by a Pipeline will be wrapped
+    //in one or more stage directives.
     stages {
-        stage('Checkout') {
+        
+        stage('Build'){
+            //The steps section defines a series of one or more steps to be executed in a given stage directive.
             steps {
-                checkout scm
+                echo "Building the application"
             }
         }
-
-        stage('Install Dependencies') {
+        
+        stage('Testing') {
             steps {
-                bat 'npm install'
+                bat "npm i"
+                bat "npx cypress run --browser ${BROWSER} --spec ${SPEC}"
             }
         }
-stage('Testing') {
-    steps {
-        script {
-            def browser = 'edge' // You can customize this
-            def spec = 'path/to/your/specs/*.spec.js' // You can customize this
-
-            bat "npx cypress run --browser ${browser} --spec ${spec} --reporter mochawesome --reporter-options reportDir=cypress/custom-report"
-        }
+        
+        stage('Deploy'){
+            steps {
+                echo "Deploying"
             }
         }
     }
 
-    post {
-        always {
-            script {
-                def REPORT_PATH = 'cypress/custom-report/mochawesome.html'
-                def REPORT_TITLE = 'Cypress Test Report'
-
-                // Upload Mochawesome report to LINE Bot
-                sh "curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer ${CHANNEL_ACCESS_TOKEN}' -d '{\"to\":\"${USER_ID}\",\"messages\":[{\"type\":\"text\",\"text\":\"${REPORT_TITLE}\"},{\"type\":\"image\",\"originalContentUrl\":\"${BUILD_URL}${REPORT_PATH}\",\"previewImageUrl\":\"${BUILD_URL}${REPORT_PATH}\"}]}' https://api.line.me/v2/bot/message/push"
-
-                // Clean up workspace
-                deleteDir()
-            }
-        }
-    }
 }
