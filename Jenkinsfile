@@ -18,15 +18,14 @@ pipeline {
                 bat 'npm install'
             }
         }
+stage('Testing') {
+    steps {
+        script {
+            def browser = 'edge' // You can customize this
+            def spec = 'path/to/your/specs/*.spec.js' // You can customize this
 
-        stage('Testing') {
-            steps {
-                script {
-                    def browser = 'edge' // You can customize this
-                    def spec = 'path/to/your/specs/*.spec.js' // You can customize this
-
-                    bat "npx cypress run --browser ${browser} --spec ${spec} --reporter mochawesome --reporter-options reportDir=cypress/custom-report"
-                }
+            bat "npx cypress run --browser ${browser} --spec ${spec} --reporter mochawesome --reporter-options reportDir=cypress/custom-report"
+        }
             }
         }
     }
