@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "cypress:run":"cypress run"
+    "cypress:run": "cypress run",
+    "test": "cypress run simple-test.js",
+    "runOnChrome": "cypress run --browser chrome",
+    "cypress:chrome": "cypress run --browser chrome --speccypress/e2e/**",
+    "cypress:edge": "cypress run --browser edge --spec cypress/e2e/**",
+    "cypress:headless": "cypress run --headless --browser chrome --spec cypress/e2e/ApiTest/Telligent_point_Exp.cy.js"
   },
   "author": "",
   "license": "ISC",
