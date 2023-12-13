@@ -42,22 +42,20 @@ pipeline {
         always {
             script {
                 BUILD_USER = getBuildUser()
-            }
-            
-            // Set the path to the Mochawesome report
-            def REPORT_PATH = 'cypress/report/mochawesome-report/mochawesome.html'
-            // Set the name of the report (optional)
-            def REPORT_NAME = 'Mochawesome Report'
-            // Set the title of the report (optional)
-            def REPORT_TITLE = 'Cypress Test Report'
+                // Set the path to the Mochawesome report
+                def REPORT_PATH = 'cypress/report/mochawesome-report/mochawesome.html'
+                // Set the name of the report (optional)
+                def REPORT_NAME = 'Mochawesome Report'
+                // Set the title of the report (optional)
+                def REPORT_TITLE = 'Cypress Test Report'
 
-            // Upload Mochawesome report to Line Bot
-            sh "curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer ${CHANNEL_ACCESS_TOKEN}' -d '{\"to\":\"${USER_ID}\",\"messages\":[{\"type\":\"text\",\"text\":\"${REPORT_TITLE}\"},{\"type\":\"image\",\"originalContentUrl\":\"${env.BUILD_URL}${REPORT_PATH}\",\"previewImageUrl\":\"${env.BUILD_URL}${REPORT_PATH}\"}]}' https://api.line.me/v2/bot/message/push"
-                        
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: 'cypress/report', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
-            
-            deleteDir()
+                // Upload Mochawesome report to Line Bot
+                sh "curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer ${CHANNEL_ACCESS_TOKEN}' -d '{\"to\":\"${USER_ID}\",\"messages\":[{\"type\":\"text\",\"text\":\"${REPORT_TITLE}\"},{\"type\":\"image\",\"originalContentUrl\":\"${env.BUILD_URL}${REPORT_PATH}\",\"previewImageUrl\":\"${env.BUILD_URL}${REPORT_PATH}\"}]}' https://api.line.me/v2/bot/message/push"
+                            
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: 'cypress/report', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
+                
+                deleteDir()
+            }
         }
     }
 }
-
