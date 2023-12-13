@@ -18,13 +18,13 @@ pipeline {
 
     stages {
         
-        stage('Build'){
+        stage('Build'){ //建立
             steps {
                 echo "Building the application"
             }
         }
         
-        stage('Testing') {
+        stage('Testing') {//測試
             steps {
                 bat "npm i"
                 bat 'npx cypress run --browser ${BROWSER} --spec ${SPEC} --reporter mochawesome --reporter-options "reportDir=cypress/custom-report"'
@@ -32,31 +32,26 @@ pipeline {
             }
         }
         
-        stage('Deploy'){
+        stage('Deploy'){ //建置成功
             steps {
                 echo "Deploying"
             }
         }
     }
 
-    post {
-        always {
-            script {
-                BUILD_USER = getBuildUser()
-                // Set the path to the Mochawesome report
-                def REPORT_PATH = 'cypress/report/mochawesome-report/mochawesome.html'
-                // Set the name of the report (optional)
-                def REPORT_NAME = 'Mochawesome Report'
-                // Set the title of the report (optional)
-                def REPORT_TITLE = 'Cypress Test Report'
+   post {
+    always {
+        script {
+            def REPORT_PATH = env.REPORT_PATH ?: 'cypress/report/mochawesome-report/mochawesome.html'
+            def REPORT_NAME = env.REPORT_NAME ?: 'Mochawesome Report'
+            def REPORT_TITLE = env.REPORT_TITLE ?: 'Cypress Test Report'
 
-                // Upload Mochawesome report to Line Bot
-                sh "curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer ${CHANNEL_ACCESS_TOKEN}' -d '{\"to\":\"${USER_ID}\",\"messages\":[{\"type\":\"text\",\"text\":\"${REPORT_TITLE}\"},{\"type\":\"image\",\"originalContentUrl\":\"${env.BUILD_URL}${REPORT_PATH}\",\"previewImageUrl\":\"${env.BUILD_URL}${REPORT_PATH}\"}]}' https://api.line.me/v2/bot/message/push"
-                            
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: 'cypress/report', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
-                
-                deleteDir()
-            }
+            // Upload Mochawesome report to Line Bot
+            sh "curl -X POST -H 'Content-Type: application/json' -H 'Authorization: Bearer ${CHANNEL_ACCESS_TOKEN}' -d '{\"to\":\"${USER_ID}\",\"messages\":[{\"type\":\"text\",\"text\":\"${REPORT_TITLE}\"},{\"type\":\"image\",\"originalContentUrl\":\"${env.BUILD_URL}${REPORT_PATH}\",\"previewImageUrl\":\"${env.BUILD_URL}${REPORT_PATH}\"}]}' https://api.line.me/v2/bot/message/push"
+
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: 'cypress/reports', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
+
+            deleteDir()
         }
     }
 }
