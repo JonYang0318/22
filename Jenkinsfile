@@ -40,32 +40,7 @@ pipeline {
             steps {
                 bat "npm i"
                 bat "npx cypress run --browser ${BROWSER} --spec ${SPEC}"
-        //           script {
-        //     def lineAccessToken = 'YOUR_LINE_ACCESS_TOKEN'
-        //     def lineUserId = 'USER_ID_TO_RECEIVE_NOTIFICATION'
-
-        //     def testResult = readFile('mochawesome-report/mochawesome.json')
-        //     def testStatus = testResult.stats.failures > 0 ? 'FAILED' : 'PASSED'
-
-        //     def message = """
-        //     Test Results: ${testStatus}
-        //     See detailed report: ${BUILD_URL}cypress/report/mochawesome.html
-        //     """
-
-        //     // Use cURL to send Line message
-        //     bat """
-        //     curl -v -X POST -H "Authorization: Bearer ${lineAccessToken}" -H "Content-Type: application/json" -d '{
-        //         "to": "${lineUserId}",
-        //         "messages": [
-        //             {
-        //                 "type": "text",
-        //                 "text": "${message}"
-        //             }
-        //         ]
-        //     }' https://api.line.me/v2/bot/message/push
-        //     """
-        // }
-        //     }
+            }
         }
         
         stage('Deploy'){
@@ -75,4 +50,36 @@ pipeline {
         }
     }
 
+    
+    
+    post {
+        always {
+            script {
+                BUILD_USER = getBuildUser()
+            }
+
+            // 用LINE Notify替换Slack通知
+            // 确保将YOUR_LINE_NOTIFY_TOKEN替换为实际的LINE Notify令牌
+            sh """
+                curl -X POST \
+                -H "Authorization: Bearer iRQ4HtmoqfgGaanKadUl9Bli0Ww93qpIZJ5g8aYCFlL" \
+                -F "message=*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} by ${BUILD_USER} Tests:${SPEC} executed at ${BROWSER} More info at: ${env.BUILD_URL}HTML_20Report/" \
+                https://notify-api.line.me/api/notify
+            """
+
+            // 发布HTML报告
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'cypress/report',
+                reportFiles: 'index.html',
+                reportName: 'HTML Report',
+                reportTitles: ''
+            ])
+
+            // 清理工作区
+            deleteDir()
+        }
+    }
 }
