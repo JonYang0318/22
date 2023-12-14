@@ -69,17 +69,15 @@ pipeline {
 
             // 发布HTML报告
             publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: false,
-                keepAll: true,
-                reportDir: 'cypress/report',
-                reportFiles: 'index.html',
-                reportName: 'HTML Report',
-                reportTitles: ''
-            ])
+            allowMissing: false,
+            alwaysLinkToLastBuild: false,
+            keepAll: true,
+            reportDir: 'reports',  // 注意這裡指定的資料夾路徑要和實際生成報告的資料夾路徑一致
+            reportFiles: 'index.html',
+            reportName: 'HTML Report',
+            reportTitles: ''
+        ])
 
-            // 清理工作区
-            deleteDir()
-        }
+        // Clean up the workspace
+        deleteDir()
     }
-}

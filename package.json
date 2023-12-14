@@ -8,8 +8,7 @@
     "test": "cypress run simple-test.js",
     "runOnChrome": "cypress run --browser chrome",
     "cypress:chrome": "cypress run --browser chrome --speccypress/e2e/**",
-    "cypress:edge": "cypress run --browser edge --spec cypress/e2e/**",
-    "cypress:headless": "cypress run --headless --browser chrome --spec cypress/e2e/ApiTest/Telligent_point_Exp.cy.js"
+    "cypress:edge": "cypress run --browser edge --spec cypress/e2e/**"
   },
   "author": "",
   "license": "ISC",
