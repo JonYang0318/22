@@ -40,32 +40,32 @@ pipeline {
             steps {
                 bat "npm i"
                 bat "npx cypress run --browser ${BROWSER} --spec ${SPEC}"
-                  script {
-            def lineAccessToken = 'YOUR_LINE_ACCESS_TOKEN'
-            def lineUserId = 'USER_ID_TO_RECEIVE_NOTIFICATION'
+        //           script {
+        //     def lineAccessToken = 'YOUR_LINE_ACCESS_TOKEN'
+        //     def lineUserId = 'USER_ID_TO_RECEIVE_NOTIFICATION'
 
-            def testResult = readFile('mochawesome-report/mochawesome.json')
-            def testStatus = testResult.stats.failures > 0 ? 'FAILED' : 'PASSED'
+        //     def testResult = readFile('mochawesome-report/mochawesome.json')
+        //     def testStatus = testResult.stats.failures > 0 ? 'FAILED' : 'PASSED'
 
-            def message = """
-            Test Results: ${testStatus}
-            See detailed report: ${BUILD_URL}cypress/report/mochawesome.html
-            """
+        //     def message = """
+        //     Test Results: ${testStatus}
+        //     See detailed report: ${BUILD_URL}cypress/report/mochawesome.html
+        //     """
 
-            // Use cURL to send Line message
-            bat """
-            curl -v -X POST -H "Authorization: Bearer ${lineAccessToken}" -H "Content-Type: application/json" -d '{
-                "to": "${lineUserId}",
-                "messages": [
-                    {
-                        "type": "text",
-                        "text": "${message}"
-                    }
-                ]
-            }' https://api.line.me/v2/bot/message/push
-            """
-        }
-            }
+        //     // Use cURL to send Line message
+        //     bat """
+        //     curl -v -X POST -H "Authorization: Bearer ${lineAccessToken}" -H "Content-Type: application/json" -d '{
+        //         "to": "${lineUserId}",
+        //         "messages": [
+        //             {
+        //                 "type": "text",
+        //                 "text": "${message}"
+        //             }
+        //         ]
+        //     }' https://api.line.me/v2/bot/message/push
+        //     """
+        // }
+        //     }
         }
         
         stage('Deploy'){
